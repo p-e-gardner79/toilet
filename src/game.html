@@ -1,0 +1,206 @@
+<div id="flush-3d">
+ <div class="viz-row"><h2>Royal Flush · 3D</h2><span class="viz-badge">Bathroom breakdown</span><button type="button" class="btn" id="f-sound" aria-pressed="true">Sound on</button></div>
+ <div class="viz-controls"><label class="form-label">Today's predicament<select id="f-level" class="form-select"><option value="50">Just visiting · 50 taps</option><option value="90" selected>A little blocked · 90 taps</option><option value="140">Cement mixer · 140 taps</option></select></label></div>
+ <div class="viz-row f-stats tabular-nums"><span>Time <strong id="f-time">20.0s</strong></span><span>Taps <strong id="f-taps">0</strong></span><span>Best <strong id="f-best">—</strong></span></div>
+ <div id="f-scene" role="img" aria-label="Front-facing 3D toilet game with a cupboard, sink and toilet roll. Taps trigger steam, spraying water, unrolling paper and falling wall tiles."><span id="f-loading">Preparing the throne…</span><div id="f-plop" hidden aria-hidden="true">PLOP!</div></div>
+ <div class="text-center" id="f-caption" aria-live="polite">A throne. A dream. Twenty seconds.</div>
+ <div class="viz-row"><span id="f-meter">Relief meter · 0%</span></div>
+ <div class="progress" role="progressbar" aria-label="Relief" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:0%"></div></div>
+ <div class="f-actions"><button type="button" class="btn btn-primary btn-block" id="f-tap" disabled>Take a seat</button></div>
+ <div class="text-center text-small">Tap the button or press Space · 20 seconds</div>
+ <div class="text-center" id="f-result" role="status"></div>
+</div>
+<style>
+#flush-3d .f-stats{justify-content:space-between;margin:12px 0}
+#flush-3d #f-scene{height:420px;position:relative;overflow:hidden}
+#flush-3d canvas{display:block;width:100%;height:100%}
+#flush-3d #f-loading{position:absolute;inset:45% 0 auto;text-align:center}
+#flush-3d #f-caption{margin:10px 0;min-height:24px}
+#flush-3d .f-actions{margin:14px 0 8px;touch-action:manipulation;user-select:none}
+#flush-3d #f-result{min-height:28px;margin-top:10px}
+#flush-3d #f-plop{position:absolute;z-index:2;left:0;right:0;top:30%;text-align:center;pointer-events:none;font-size:clamp(48px,12vw,88px);font-weight:500;line-height:1.2;color:var(--primary-foreground);text-shadow:3px 3px 0 var(--primary),-3px -3px 0 var(--primary),3px -3px 0 var(--primary),-3px 3px 0 var(--primary)}
+#flush-3d #f-result .f-total{font-size:32px;font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:no-preference){#flush-3d #f-plop:not([hidden]){animation:plop-pop .55s ease-out}@keyframes plop-pop{0%{transform:scale(.2) rotate(-15deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(-3deg)}}}
+</style>
+<script type="module">
+const root=document.getElementById('flush-3d'),q=s=>root.querySelector(s);
+const ROUND_SECONDS=20;
+const musicData='__MUSIC_BASE64__';
+let musicBuffer=null,musicSource=null,musicGain=null;
+// Decode embedded MP3 bytes locally; playback begins only on the round-start gesture.
+const musicReady=(async()=>{try{const Decoder=window.OfflineAudioContext||window.webkitOfflineAudioContext;const ctx=new Decoder(2,1,44100);const bytes=Uint8Array.from(atob(musicData),c=>c.charCodeAt(0));musicBuffer=await ctx.decodeAudioData(bytes.buffer);}catch(e){q('#f-caption').textContent='Music could not be decoded in this browser.';}})();
+try {
+const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js');
+const host=q('#f-scene'),renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);q('#f-loading').remove();
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.1,60);camera.position.set(0,3.4,10.8);camera.lookAt(0,2.3,0);
+scene.add(new THREE.HemisphereLight(0xe4faff,0x756078,2.1));
+const key=new THREE.DirectionalLight(0xffead8,3.1);key.position.set(-3,7,6);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+const rim=new THREE.DirectionalLight(0xb7d8ff,2);rim.position.set(4,4,-2);scene.add(rim);
+const mat=(c,r=.5)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const skin=mat(0xefb078),blush=mat(0xee8477),shirt=mat(0x7056c9),white=mat(0xfff9ee,.24),dark=mat(0x252433),iris=mat(0x48aeb2),hair=mat(0x543629),pants=mat(0x385678),sole=mat(0x273649),tile=mat(0x87b4b0),grout=mat(0x6b9492);
+const ballGeo=new THREE.SphereGeometry(1,32,24);
+function ball(parent,m,x,y,z,sx,sy,sz){const o=new THREE.Mesh(ballGeo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
+function box(parent,m,x,y,z,sx,sy,sz){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
+function limb(parent,m,a,b,r){const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),d=bv.clone().sub(av);const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),20),m);o.position.copy(av).add(bv).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());o.castShadow=true;parent.add(o);ball(parent,m,...a,r,r,r);ball(parent,m,...b,r,r,r);return o;}
+box(scene,grout,0,-.08,0,9,.12,7);
+for(let x=-4;x<=4;x++)for(let z=-3;z<=2;z++)box(scene,tile,x,.0,z,.96,.04,.96);
+box(scene,grout,0,2.7,-1.5,9,5.4,.12);
+const wallTiles=[];
+for(let x=-4;x<=4;x++)for(let y=0;y<6;y++){const o=box(scene,tile,x,y+.5,-1.41,.96,.96,.06);wallTiles.push({o,home:o.position.clone(),fall:false,vy:0,landed:false,threshold:.6+((x+4)*7+y*11)%24/100});}
+const chrome=mat(0xb4cbd3,.18),wood=mat(0xc58d52),waterMat=new THREE.MeshStandardMaterial({color:0x58cfff,roughness:.15,metalness:.12,transparent:true,opacity:.78});
+// Cupboard with two doors, handles, shelf accessories and a towel.
+box(scene,wood,-2.25,3.45,-1.09,1.45,1.25,.6);
+for(const s of [-1,1]){box(scene,mat(s<0?0xdeae70:0xd8a267),-2.25+s*.35,3.45,-.76,.66,1.13,.07);ball(scene,chrome,-2.25+s*.10,3.39,-.68,.035,.10,.035);}
+box(scene,white,-2.25,2.75,-.97,1.56,.10,.84);
+box(scene,shirt,-2.6,2.55,-.62,.4,.34,.09);
+// Basin, vanity, tap and mirror, at the character's right.
+box(scene,wood,2.25,.76,-.68,1.35,1.45,.95);
+for(const s of [-1,1]){box(scene,mat(0xd9a771),2.25+s*.32,.81,-.17,.59,1.18,.055);ball(scene,chrome,2.25+s*.08,.96,-.12,.034,.08,.034);}
+ball(scene,white,2.25,1.57,-.57,.83,.22,.65);
+ball(scene,mat(0x8ea8b5),2.25,1.72,-.52,.57,.025,.38);
+limb(scene,chrome,[2.25,1.7,-1.05],[2.25,2.15,-1.05],.055);
+limb(scene,chrome,[2.25,2.15,-1.05],[2.25,2.15,-.67],.055);
+box(scene,chrome,2.25,3.23,-1.23,1.5,1.5,.12);box(scene,mat(0xbcdfe3,.2),2.25,3.23,-1.15,1.32,1.32,.025);
+ball(scene,mat(0xf0b76b),2.8,1.88,-.91,.12,.2,.10);box(scene,chrome,2.8,2.1,-.91,.18,.045,.04);
+// The wall mount falls as one piece; the separate roll then spins across the floor.
+const holder=new THREE.Group();holder.position.set(-1.98,1.9,-.91);scene.add(holder);
+box(holder,chrome,0,0,-.3,.85,.16,.1);
+for(const s of [-1,1])limb(holder,chrome,[s*.37,0,-.3],[s*.37,0,.12],.045);
+limb(holder,chrome,[-.38,0,.12],[.38,0,.12],.045);
+const roll=new THREE.Group();roll.position.set(-1.98,1.9,-.79);scene.add(roll);
+const paperRoll=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.56,32),white);paperRoll.rotation.z=Math.PI/2;roll.add(paperRoll);
+for(const s of [-1,1]){const core=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.014,20),wood);core.rotation.z=Math.PI/2;core.position.x=s*.29;roll.add(core);}
+const hanging=box(scene,white,-1.98,1.56,-.55,.53,.55,.02);
+const paper=[];
+for(let i=0;i<55;i++){const o=box(scene,white,0,.07,0,.48,.018,.27);o.visible=false;paper.push(o);}
+const droplets=[];
+for(let i=0;i<75;i++){const o=ball(scene,waterMat,0,0,0,.035,.08,.035);o.visible=false;droplets.push({o,age:-1,v:new THREE.Vector3()});}
+const puddle=ball(scene,waterMat,2.1,.06,.35,.01,.012,.01);puddle.visible=false;
+let rollTime=-1,holderY=1.9,holderV=0,waterOn=false,waterClock=0,wetness=0,scoreEnd=0,scoreTotal=0,nextTrump=0;
+function resetBathroom(){for(const a of wallTiles){a.o.position.copy(a.home);a.o.rotation.set(0,0,0);a.fall=false;a.landed=false;a.vy=0;}holder.position.set(-1.98,1.9,-.91);holder.rotation.set(0,0,0);roll.position.set(-1.98,1.9,-.79);roll.rotation.set(0,0,0);hanging.visible=true;for(const o of paper)o.visible=false;for(const d of droplets){d.age=-1;d.o.visible=false;}rollTime=-1;holderY=1.9;holderV=0;waterOn=false;wetness=0;waterClock=0;puddle.visible=false;q('#f-plop').hidden=true;}
+// Synthesized sound: filtered noise for wind, a modulated rasp for comic trumping,
+// and a descending sine plus bubbly noise for the final plop. No media downloads.
+let audio=null,master=null,wind=null,windSource=null,soundOn=true,noiseBuffer=null;
+function initAudio(){
+ try{if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('Audio unavailable');audio=new AC();master=audio.createGain();master.gain.value=soundOn?.42:0;master.connect(audio.destination);
+ noiseBuffer=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate);const samples=noiseBuffer.getChannelData(0);for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;
+ windSource=audio.createBufferSource();windSource.buffer=noiseBuffer;windSource.loop=true;const filter=audio.createBiquadFilter();filter.type='lowpass';filter.frequency.value=480;wind=audio.createGain();wind.gain.value=0;windSource.connect(filter);filter.connect(wind);wind.connect(master);windSource.start();}
+ audio.resume().catch(()=>{});
+ }catch(e){q('#f-sound').textContent='Sound unavailable';q('#f-sound').disabled=true;}
+}
+function noiseBurst(duration,volume,freq){if(!audio||!soundOn)return;const t=audio.currentTime,src=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain();src.buffer=noiseBuffer;f.type='bandpass';f.frequency.value=freq;g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);src.connect(f);f.connect(g);g.connect(master);src.start();src.stop(t+duration);src.onended=()=>{src.disconnect();f.disconnect();g.disconnect();};}
+function trumpet(){if(!audio||!soundOn)return;const t=audio.currentTime,d=.22+Math.random()*.25,o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter(),lfo=audio.createOscillator(),lg=audio.createGain();o.type='sawtooth';o.frequency.setValueAtTime(80+Math.random()*50,t);o.frequency.exponentialRampToValueAtTime(38,t+d);f.type='lowpass';f.frequency.value=650;f.Q.value=3;lfo.frequency.value=25;lg.gain.value=22;lfo.connect(lg);lg.connect(o.frequency);g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.24,t+.025);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(f);f.connect(g);g.connect(master);o.start();lfo.start();o.stop(t+d);lfo.stop(t+d);o.onended=()=>{o.disconnect();lfo.disconnect();lg.disconnect();f.disconnect();g.disconnect();};noiseBurst(d,.10,280);}
+function plopSound(){if(!audio||!soundOn)return;const t=audio.currentTime;for(let i=0;i<3;i++){const o=audio.createOscillator(),g=audio.createGain(),start=t+i*.10;o.frequency.setValueAtTime(420-i*90,start);o.frequency.exponentialRampToValueAtTime(42,start+.25);g.gain.setValueAtTime(.001,start);g.gain.linearRampToValueAtTime(.52/(i+1),start+.009);g.gain.exponentialRampToValueAtTime(.001,start+.28);o.connect(g);g.connect(master);o.start(start);o.stop(start+.3);o.onended=()=>{o.disconnect();g.disconnect();};}noiseBurst(.5,.28,850);}
+q('#f-sound').addEventListener('click',()=>{soundOn=!soundOn;initAudio();if(master)master.gain.setTargetAtTime(soundOn?.42:0,audio.currentTime,.02);q('#f-sound').textContent=soundOn?'Sound on':'Sound off';q('#f-sound').setAttribute('aria-pressed',String(soundOn));});
+const throne=new THREE.Group();scene.add(throne);
+box(throne,white,0,1.65,-.62,1.5,1.4,.45);ball(throne,white,0,.8,.12,.8,.65,.85);ball(throne,white,0,.4,.0,.46,.45,.55);
+const seat=new THREE.Mesh(new THREE.TorusGeometry(.64,.11,16,56),white);seat.rotation.x=Math.PI/2;seat.position.set(0,1.24,.18);seat.scale.y=1.22;throne.add(seat);
+box(throne,white,0,2.39,-.62,1.62,.13,.55);box(throne,mat(0xc5d4d9,.16),.48,2.21,-.36,.22,.1,.08);
+const body=new THREE.Group();scene.add(body);
+ball(body,shirt,0,1.99,.12,.63,.72,.42);
+ball(body,pants,0,1.37,.24,.61,.23,.45);
+for(const s of [-1,1]){
+ limb(body,skin,[s*.36,1.36,.4],[s*.67,1.18,.94],.25);
+ limb(body,skin,[s*.67,1.18,.94],[s*.67,.38,1.0],.19);
+ ball(body,pants,s*.67,.32,1.0,.26,.2,.25);
+ ball(body,sole,s*.68,.16,1.14,.28,.16,.43);
+ ball(body,shirt,s*.56,2.16,.12,.25,.3,.26);
+ limb(body,skin,[s*.62,2.1,.23],[s*.79,1.63,.53],.14);
+ limb(body,skin,[s*.79,1.63,.53],[s*.64,1.48,.91],.14);
+ ball(body,skin,s*.64,1.47,.94,.21,.17,.18);
+ for(let k=0;k<3;k++)ball(body,skin,s*.64+(k-1)*.085,1.44,1.08,.048,.095,.055);
+}
+const face=new THREE.Group();face.position.set(0,3.1,.26);body.add(face);
+ball(face,skin,0,0,0,.8,.91,.64);ball(face,skin,0,-.46,.23,.6,.43,.48);
+for(const s of [-1,1]){ball(face,skin,s*.81,0,0,.2,.3,.15);ball(face,blush,s*.86,0,.12,.105,.18,.04);ball(face,blush,s*.49,-.24,.55,.19,.12,.04);}
+for(let k=0;k<7;k++){const x=(k-3)*.18;const lock=ball(face,hair,x,.78+Math.sin(k*.7)*.07,-.04,.22,.22,.43);lock.rotation.z=(k-3)*-.15;}
+const eyes=[],pupils=[],brows=[];
+for(const s of [-1,1]){
+ const eye=ball(face,white,s*.31,.18,.56,.28,.31,.19);eyes.push(eye);
+ const pupil=new THREE.Group();pupil.position.set(s*.31,.18,.752);face.add(pupil);ball(pupil,iris,0,0,0,.126,.15,.047);ball(pupil,dark,0,0,.044,.064,.089,.026);ball(pupil,white,-.027,.044,.065,.025,.029,.012);pupils.push(pupil);
+ brows.push(ball(face,hair,s*.32,.54,.57,.29,.063,.075));
+}
+const nose=ball(face,skin,0,-.12,.72,.18,.22,.23);
+for(const s of [-1,1])ball(face,dark,s*.09,-.23,.863,.046,.029,.02);
+const mouth=new THREE.Group();mouth.position.set(0,-.47,.66);face.add(mouth);ball(mouth,dark,0,0,0,.32,.115,.047);ball(mouth,white,0,.019,.043,.272,.07,.024);
+for(let k=-2;k<=2;k++)box(mouth,dark,k*.08,.02,.068,.008,.1,.004);
+// Each steam puff is a lit 3D particle emitted at an ear or nostril.
+const steam=[];const steamGeo=new THREE.SphereGeometry(1,10,8);
+function puff(x,y,z,dx,strength){
+ if(steam.length>100)return;
+ const m=new THREE.MeshStandardMaterial({color:0xf3fbff,transparent:true,opacity:.75,roughness:1,depthWrite:false});
+ const o=new THREE.Mesh(steamGeo,m);face.add(o);o.position.set(x,y,z);o.scale.setScalar(.06);steam.push({o,age:0,dx,dy:.32+Math.random()*.25,dz:.3,life:.55+Math.random()*.35,size:.12+strength*.14});
+}
+let state='ready',taps=0,target=90,best=0,deadline=0,pressure=0,kick=0,last=performance.now(),emit=0,stage=-1;
+const button=q('#f-tap'),level=q('#f-level'),caption=q('#f-caption'),result=q('#f-result');await musicReady;button.disabled=false;
+function stopMusic(){if(musicSource){try{musicSource.stop();}catch(e){}musicSource.disconnect();musicSource=null;}if(musicGain){musicGain.disconnect();musicGain=null;}}
+function startMusic(){stopMusic();if(!audio||!musicBuffer)return;musicSource=audio.createBufferSource();musicSource.buffer=musicBuffer;musicGain=audio.createGain();musicGain.gain.value=.85;musicSource.connect(musicGain);musicGain.connect(master);musicSource.start(0,0,ROUND_SECONDS);}
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+function update(){const p=Math.min(100,Math.floor(taps/target*100));q('#f-taps').textContent=taps;q('#f-meter').textContent='Relief meter · '+p+'%';q('.progress-bar').style.width=p+'%';q('.progress').setAttribute('aria-valuenow',p);const next=Math.min(4,Math.floor(taps/target*4));if(next!==stage){stage=next;caption.textContent=['Negotiations have begun.','Nostrils: fully operational.','Ears entering kettle mode.','The plumbing is getting nervous.','Maximum pressure. Keep tapping!'][next];}}
+function finish(){
+ state='done';stopMusic();q('#f-time').textContent='0.0s';level.disabled=false;waterOn=false;
+ const ratio=taps/target,rank=ratio>=1.5?'Legendary Relief':ratio>=1.2?'Royal Flush':ratio>=1?'Successful Deposit':'Unfinished Business';
+ const effort=taps*10,chaos=(rollTime>=0?150:0)+(wetness>0?100:0)+wallTiles.filter(a=>a.fall).length*20,bonus=ratio>=1?500:0;
+ scoreTotal=effort+chaos+bonus;scoreEnd=performance.now();best=Math.max(best,scoreTotal);q('#f-best').textContent=best.toLocaleString()+' pts';
+ result.innerHTML='<div class="card"><div>'+rank+'</div><div class="f-total" aria-hidden="true"><span id="f-total">0</span> pts</div><div class="sr-only">Final score '+scoreTotal+' points.</div><div class="viz-row text-small"><span>Taps '+effort+'</span><span>Bathroom chaos '+chaos+'</span><span>Relief bonus '+bonus+'</span></div><div class="text-small">'+taps+' taps · '+(taps/ROUND_SECONDS).toFixed(1)+' taps/sec</div></div>';
+ caption.textContent=ratio>=1?'And suddenly… inner peace.':'A tiny plop. Still unfinished business.';
+ q('#f-plop').hidden=false;plopSound();button.disabled=true;button.textContent='Tallying…';
+}
+function activate(){if(state!=='playing'){initAudio();startMusic();resetBathroom();state='playing';taps=0;stage=-1;target=+level.value;deadline=performance.now()+ROUND_SECONDS*1000;nextTrump=performance.now()+1100;pressure=0;kick=0;result.textContent='';level.disabled=true;button.textContent='TAP! TAP! TAP!';update();return;}if(performance.now()>=deadline){finish();return;}taps++;kick=1;update();}
+button.addEventListener('click',activate);
+root.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===button){e.preventDefault();if(!e.repeat&&!button.disabled)activate();}});
+level.addEventListener('change',()=>{resetBathroom();state='ready';taps=0;stage=-1;target=+level.value;update();q('#f-time').textContent='20.0s';button.disabled=false;button.textContent='Take a seat';result.textContent='';caption.textContent='A throne. A dream. Twenty seconds.';});
+function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.z=Math.max(10.8,10.5/camera.aspect);camera.updateProjectionMatrix();}const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
+function bathroom(dt,t,now){
+ const amount=taps/target,active=state==='playing';
+ if(active&&amount>=.2)waterOn=true;
+ if(active&&amount>=.42&&rollTime<0){rollTime=0;hanging.visible=false;noiseBurst(.23,.2,1800);}
+ if(rollTime>=0){
+  rollTime+=dt;const r=rollTime;
+  if(holderY>.13){holderV-=dt*7;holderY=Math.max(.13,holderY+holderV*dt);holder.position.y=holderY;holder.position.z=Math.min(.35,-.91+r*.8);holder.rotation.z=Math.min(1.7,r*2);holder.rotation.x=Math.min(1.4,r*1.5);}
+  roll.position.set(-1.98+Math.sin(Math.min(r,3)*1.5)*.85,Math.max(.27,1.9-3.6*r*r),Math.min(2.3,-.79+r*1.05));roll.rotation.x=Math.min(r,3)*8;roll.rotation.y=Math.sin(Math.min(r,3))*1.2;
+  const count=Math.min(paper.length,Math.floor(r*20));
+  for(let i=0;i<count;i++){const o=paper[i],a=i*.17;o.visible=true;o.position.set(-1.8+Math.sin(a*1.65)*.9+(i>30?(i-30)*.11:0),.08+Math.abs(Math.sin(a*3))*.07,Math.min(2.8,-.5+a*.53));o.rotation.y=Math.cos(a)*.8;o.rotation.z=Math.sin(a*2)*.07;}
+ }
+ if(waterOn){wetness=Math.min(1,wetness+dt*.12);waterClock+=dt;while(waterClock>.025){waterClock-=.025;const d=droplets.find(p=>p.age<0);if(!d)break;d.age=0;d.o.visible=true;d.o.position.set(2.25,2.16,-.65);d.v.set((Math.random()-.5)*(1+amount),2+Math.min(1,amount)*2+Math.random(),1+Math.random()*1.4);}}
+ for(const d of droplets){if(d.age<0)continue;d.age+=dt;d.v.y-=dt*8;d.o.position.addScaledVector(d.v,dt);if(d.o.position.y<.08||d.age>2){d.age=-1;d.o.visible=false;}}
+ puddle.visible=wetness>0;puddle.scale.set(wetness*1.3,.014,wetness*1.1);
+ for(const a of wallTiles){
+  if(!a.fall&&active&&Math.abs(a.home.x)<=3&&a.home.y<5&&amount>=a.threshold){a.fall=true;noiseBurst(.1,.035,1900);}
+  if(a.fall&&!a.landed){a.vy-=dt*7;a.o.position.y+=a.vy*dt;a.o.position.z+=dt*(.65+Math.abs(a.home.x)*.15);a.o.rotation.x+=dt*2.6;a.o.rotation.z+=dt*(a.home.x<0?-.6:.6);if(a.o.position.y<=.12){a.o.position.y=.10+Math.abs(a.home.x)*.005;a.o.rotation.x=Math.PI/2;a.landed=true;}}
+  else if(!a.fall){a.o.rotation.z=!reduced.matches&&active&&amount>.45?Math.sin(t*30+a.home.x+a.home.y)*.02*amount:0;}
+ }
+ if(audio&&wind){wind.gain.setTargetAtTime(active&&document.visibilityState!=='hidden'?.035+pressure*.07:0,audio.currentTime,.2);}
+ if(active&&now>=nextTrump){trumpet();nextTrump=now+1700-Math.min(1,amount)*1050;}
+ if(state==='done'){
+  const elapsed=(now-scoreEnd)/1000,u=Math.min(1,elapsed/1.35),tally=q('#f-total');if(tally)tally.textContent=Math.round(scoreTotal*(1-Math.pow(1-u,3))).toLocaleString();
+  if(elapsed>=1.35){button.disabled=false;button.textContent='Another sitting';}if(elapsed>=1.8)q('#f-plop').hidden=true;
+ }
+}
+function animate(now){
+ if(!root.isConnected){resizeObserver.disconnect();stopMusic();if(audio)audio.close().catch(()=>{});renderer.dispose();return;}requestAnimationFrame(animate);
+ const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
+ if(state==='playing'){if(now>=deadline)finish();else q('#f-time').textContent=((deadline-now)/1000).toFixed(1)+'s';}
+ const desired=state==='playing'?Math.min(1,taps/target):0;pressure+=(desired-pressure)*Math.min(1,dt*8);kick=Math.max(0,kick-dt*7);
+ const relief=state==='done'&&taps>=target;
+ skin.color.setHex(0xefb078).lerp(new THREE.Color(0xe85f53),pressure*.62);
+ face.rotation.z=reduced.matches?0:Math.sin(t*40)*pressure*.035+Math.sin(t*55)*kick*.026;
+ body.position.y=reduced.matches?0:kick*.045;
+ face.scale.set(1+pressure*.04,1-pressure*.035,1);
+ for(let i=0;i<2;i++){
+  const s=i===0?-1:1;
+  eyes[i].scale.set(.28+pressure*.048,relief?.11:.31+pressure*.06,.19+pressure*.06);
+  pupils[i].position.set(s*.31+(reduced.matches?0:Math.sin(t*(8+i*5)+i*2)*pressure*.09),.18+(reduced.matches?0:Math.cos(t*(11+i*3))*pressure*.075),.752+pressure*.06);
+  pupils[i].scale.setScalar(relief?.7:1-pressure*.3);
+  brows[i].rotation.z=s*(relief?-.15:pressure*.43);brows[i].position.y=.54+pressure*.025;
+ }
+ mouth.scale.set(1+pressure*.22,relief?1.65:1+pressure*.85,1);mouth.rotation.z=relief?0:Math.sin(t*20)*pressure*.03;
+ nose.scale.set(.18+pressure*.025,.22,.23);
+ if(state==='playing'&&pressure>.12&&!reduced.matches){emit+=dt;if(emit>.1-pressure*.055){emit=0;for(const s of [-1,1]){puff(s*.095,-.23,.92,s*.65,pressure);if(pressure>.35)puff(s*.96,.02,.07,s*2.3,pressure);}}}
+ for(let i=steam.length-1;i>=0;i--){const p=steam[i];p.age+=dt;const u=p.age/p.life;if(u>=1){face.remove(p.o);p.o.material.dispose();steam.splice(i,1);continue;}p.o.position.x+=p.dx*dt;p.o.position.y+=p.dy*dt;p.o.position.z+=p.dz*dt;p.o.scale.setScalar(.04+u*p.size);p.o.material.opacity=.7*(1-u);}
+ bathroom(dt,t,now);renderer.render(scene,camera);
+}requestAnimationFrame(animate);
+}catch(error){const message=q('#f-loading')||q('#f-caption');message.textContent='The 3D scene could not load. Reopen this preview with WebGL and CDN access enabled.';message.setAttribute('role','alert');}
+</script>
