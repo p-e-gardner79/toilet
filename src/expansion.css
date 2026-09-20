@@ -1,0 +1,21 @@
+#rf-retro #rhythm-guide{position:absolute;top:14%;left:26%;right:26%;padding:7px 10px;background:linear-gradient(#173f65ee,#07182fee);border:2px solid var(--rhythm-color,#76efff);border-radius:10px;text-align:center;box-shadow:0 4px #061124;pointer-events:none}
+#rf-retro #rhythm-title{display:block;color:var(--rhythm-color,#76efff);font-size:clamp(12px,2.6cqw,26px);text-shadow:2px 2px #040b18}
+#rf-retro #rhythm-detail{display:block;font-size:clamp(7px,1.1cqw,12px);color:#fff5ca;margin-top:3px}
+#rf-retro .rhythm-track{height:5px;background:#040c1e;border-radius:5px;margin-top:7px;overflow:hidden}
+#rf-retro #rhythm-fill{display:block;height:100%;width:0;background:var(--rhythm-color,#76efff)}
+#rf-retro .challenge-wrap{left:4%;right:4%}
+#rf-retro .challenge .stars{display:none}
+#rf-retro .challenge .lock{top:38px;right:4px;font-size:8px}
+#rf-retro .final-rows{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;max-width:500px}
+#rf-retro .final-rows>div{padding:5px 3px;font-size:9px}
+#rf-retro .final-rows b{font-size:18px;margin-top:2px}
+#rf-retro .finale h1{margin:6px 0 10px}
+#rf-retro .finale .dial{width:min(58%,300px)}
+#rf-retro .finale .final-total{font-size:clamp(35px,6cqw,60px)}
+@media(max-width:540px){#rf-retro .challenge .portrait{width:60px;height:48px}#rf-retro .challenge .num{font-size:13px}#rf-retro .challenge .name{font-size:8px;min-height:20px}#rf-retro .challenge .lock{font-size:6px;top:23px}#rf-retro .challenge .tag{font-size:6px}#rf-retro .challenge-wrap{left:2%;right:2%}#rf-retro #rhythm-guide{top:14%;left:23%;right:23%;padding:4px 5px}#rf-retro .rhythm-track{margin-top:4px;height:4px}#rf-retro .finale .final-rows b{font-size:16px}#rf-retro .finale .final-rows>div{font-size:8px}}
+#rf-retro #rhythm-guide{position:relative;top:auto;left:auto;right:auto;border-radius:0;padding:6px 14px;border-width:2px 0;box-shadow:none}
+#rf-retro #rhythm-title{font-size:18px}#rf-retro #rhythm-detail{font-size:10px}
+#rf-retro .rhythm-track{max-width:400px;margin:5px auto 0}
+@media(min-width:700px) and (max-height:1100px){#rf-retro:has(#rhythm-guide:not([hidden])){max-width:min(1000px,calc((100dvh - 380px)*1.333))}}
+
+#rf-retro #rf-flush.pushing{transform:translateY(5px);background:radial-gradient(#fff5b0,#ffb940);box-shadow:inset 0 0 0 3px #fff9,0 3px #04192c}
