@@ -1,0 +1,132 @@
+{
+  "source": "Two user-supplied Arcade energetic ElevenLabs takes, 2026-09-20",
+  "originals": [
+    "ElevenLabs_2026-09-20T12_21_15_Arcade (energetic)_gen_sp100_s50_sb75_se0_b_m2.mp3",
+    "ElevenLabs_2026-09-20T12_21_47_Arcade (energetic)_gen_sp100_s50_sb75_se0_b_m2.mp3"
+  ],
+  "cuts_seconds": {
+    "pace-it": [
+      0,
+      0,
+      1.4
+    ],
+    "steady": [
+      0,
+      1.59,
+      3.43
+    ],
+    "faster": [
+      0,
+      3.98,
+      5.6
+    ],
+    "get-ready": [
+      0,
+      5.87,
+      6.53
+    ],
+    "push-hold": [
+      0,
+      6.66,
+      9.34
+    ],
+    "keep-holding": [
+      0,
+      9.82,
+      11.76
+    ],
+    "release": [
+      0,
+      11.86,
+      12.54
+    ],
+    "relief": [
+      0,
+      12.92,
+      15.19
+    ],
+    "three": [
+      1,
+      0,
+      0.46
+    ],
+    "two": [
+      1,
+      0.66,
+      1.08
+    ],
+    "one": [
+      1,
+      1.24,
+      1.66
+    ],
+    "go": [
+      1,
+      1.83,
+      2.66
+    ]
+  },
+  "processing": "Dry-forward stereo convolution reverb, dense decaying reflections, 19ms pre-delay, 280\u2013360ms tail; normalized, no time-stretch or pitch shift",
+  "clips": {
+    "pace-it": {
+      "duration_ms": 1715,
+      "peak": 0.6487773619929831,
+      "tail_seconds": 0.28
+    },
+    "steady": {
+      "duration_ms": 2155,
+      "peak": 0.8486188070713012,
+      "tail_seconds": 0.28
+    },
+    "faster": {
+      "duration_ms": 1935,
+      "peak": 0.8800000000000001,
+      "tail_seconds": 0.28
+    },
+    "get-ready": {
+      "duration_ms": 975,
+      "peak": 0.88,
+      "tail_seconds": 0.28
+    },
+    "push-hold": {
+      "duration_ms": 3075,
+      "peak": 0.7071985731042608,
+      "tail_seconds": 0.36
+    },
+    "keep-holding": {
+      "duration_ms": 2255,
+      "peak": 0.88,
+      "tail_seconds": 0.28
+    },
+    "release": {
+      "duration_ms": 1075,
+      "peak": 0.8799777125280617,
+      "tail_seconds": 0.36
+    },
+    "relief": {
+      "duration_ms": 2585,
+      "peak": 0.7645940770626771,
+      "tail_seconds": 0.28
+    },
+    "three": {
+      "duration_ms": 775,
+      "peak": 0.8639612197533407,
+      "tail_seconds": 0.28
+    },
+    "two": {
+      "duration_ms": 735,
+      "peak": 0.88,
+      "tail_seconds": 0.28
+    },
+    "one": {
+      "duration_ms": 735,
+      "peak": 0.88,
+      "tail_seconds": 0.28
+    },
+    "go": {
+      "duration_ms": 1225,
+      "peak": 0.788273295581864,
+      "tail_seconds": 0.36
+    }
+  }
+}
