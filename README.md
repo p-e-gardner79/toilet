@@ -1,108 +1,94 @@
-# Royal Flush
+# Royal Flush — Retro Arcade
 
-A three-level 3D tapping game with an increasingly distressed cast and destructible bathrooms.
+The complete four-level game with a plunger bonus, rebuilt in the approved illustrated 1990s arcade style.
 
 ## Play
 
-Open `index.html` in a modern browser with WebGL enabled. Internet access is needed for the pinned Three.js library. Music is embedded; no backend, npm installation, or API key is required.
+Open `index.html` in a modern browser. Everything is embedded: artwork, all six music tracks, 24 effects and twelve recorded announcer clips. No internet connection, backend, npm installation or API key is required. Tap FLUSH or press Space. On desktop the layout adapts to the window height; phones show the whole scene and large touch controls.
 
-If your browser restricts local files, run `python -m http.server 8000 --bind 127.0.0.1` in this folder, then open http://localhost:8000.
+- Level 1: Banana Bandit — 110 relief units, bathroom, Gummy Jump Fever.
+- Level 2: The Final Rep — 125 units, gym, Final Set Hero.
+- Bonus after Level 2: Plunger Panic — 12 seconds, Bonus-level soundtrack.
+- Level 3: Royal Blockage — 140 units, palace, Lift on the Throne.
+- Level 4: Sumo Showdown — 150 relief units earned through rhythm, Mount Fuji bathhouse, sumo-level soundtrack.
 
-Choose an unlocked level and press START. Tap FLUSH, or press and release Space while it is focused. Holding a key does not produce repeated taps.
+Each attempt has an expressive recorded arcade announcer calling THREE, TWO, ONE, GO alongside the three-second countdown and up to 35 seconds of play. Reach 100% for 3,000 points plus 100 points per remaining second. Progress becomes harder near the end. Failures stay below 3,000 and show the exact shortfall; attempts never accumulate toward a pass. Awards at 25%, 50% and 75% are cosmetic.
 
-## Levels
+Every main level now uses slow taps, fast taps, a get-ready warning, a sustained held push and a timed release. Release correctly for +12 relief. Gentle play assists only the tapping phases; held pushes and releases remain deliberate. Personal bests are separate for Classic and Gentle.
 
-| Level | Character | Predicament | Target | Music |
-| --- | --- | --- | --- | --- |
-| 1 | Banana Bandit | Too many bananas | 85 taps | Gummy Jump Fever |
-| 2 | Protein Powerhouse | Too much protein, in a gym toilet | 105 taps | Final Set Hero |
-| 3 | The Throne King | A kingdom of cheese | 125 taps | Lift on the Throne |
+Complete all four levels in one run for the animated final Royal Relief Meter, per-level breakdown and rank. Starting an unlocked later level is practice and does not fabricate missing campaign scores. Unlocks, options and classic/gentle personal bests use the same storage keys as the previous version when available.
 
-Attempts last **up to 35 seconds**. Reaching 100% ends the attempt immediately. The next level requires **3,000 points in one attempt**, with no carry-over. The meter starts generously and requires progressively more taps per percentage point near the end. Later levels require more total taps.
+## Animated scenes
 
-Scoring:
+- Bathroom: three character expressions, fists/heel movement, steam and sweat, bursting sink, detached toilet roll and unravelling paper, sequential falling tiles, opening cupboard, panicked mouse carrying a tiny roll and escaping, floor cracks and falling KEEP CALM sign.
+- Gym: massive moustached bodybuilder, mohawked muscular lifter with animated barbell/hand alignment, green trainer and clipboard, ponytailed yellow runner. Rattling weights, fleeing bystanders, flying clipboard, bouncing plates and the runner falling onto the floor at the final plop.
+- Palace: crowned king, butler, trumpeter, two guards and armour. Flying tray, swaying chandelier, escaping guards, falling armour, airborne crown and royal reactions.
+- Menu: overhead toilet, animated whirlpool and orbiting crowned turd; illustrated challenge portraits and saved locks.
 
-- Effort: up to 2,000 points, proportional to progress.
-- 25%: Golden Toilet Brush, +200.
-- 50%: Bleach of Glory, +300.
-- 75%: Emergency Laxative, +500.
-- 100%: successful relief, +500.
+Animation uses separate sprite layers, expression poses and procedural movement. The original concept pictures are visual references, not static screenshots used as the whole game. See `RETRO-ART.md` for the asset prompt set and provenance.
 
-A completed attempt earns **3,500 points**. Failed attempts show the exact points shortfall. NEXT advances; RETRY resets attempt points and awards. Unlocks are saved in browser storage when available; restricted contexts may retain progress only for the session.
+## Sound and options
 
-## Audio
+The full Victory on the Throne menu recording loops only after its complete duration. Menu playback is attempted automatically; a browser may require the first click/key press before audible playback. Any interaction retries audio, without a separate menu-music button. Level music starts after the countdown. Existing effects accompany their scene events; the tally loop lasts exactly as long as the score count-up (2.4 seconds per round; five 1.6-second stages in the finale, including the bonus).
 
-The complete Victory on the Throne track plays on the menu, looping only after the full song. The game attempts autoplay on load. Browsers may block audible autoplay until an interaction; the first click or key press anywhere resumes audio. No separate MENU MUSIC press is needed. SOUND/MUTED controls all audio.
-
-The export is a top-level browser page, avoiding the previous iframe's audio-permission boundary. Starting a round stops menu music and starts the level track. Finishing stops gameplay music for the plop.
-
-The inline preview uses compressed full-length menu music and 35-second gameplay clips. The export uses MP3 versions. The user supplied the tracks; this package grants no music license. No project open-source license has been selected.
+OPTIONS contains separate music/effects volume, reduced motion, gentle play and optional soft CRT scanlines. The timer and media pause while options are open or the tab is hidden. Music and scene effects were supplied by the user; countdown and coach recordings were also supplied by the user. This package does not grant a separate music license.
 
 ## GitHub Pages
 
-1. Create a repository, such as `royal-flush`.
-2. Upload this folder's contents, with `index.html` at the repository root. Do not upload only the ZIP.
-3. Under **Settings → Pages**, choose **Deploy from a branch**, then `main` and `/(root)`.
-4. Use the published address shown by GitHub Pages.
+Upload the contents of this folder with `index.html` at the repository root. Enable Pages for the desired branch/root folder. The prebuilt page needs no build service. The sibling `royal-flush-github.zip` contains this complete package.
 
-Official guide: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+## Edit and build
 
-## Edit and rebuild
+- `src/retro.html`: interface markup.
+- `src/retro.css` and `src/retro-extra.css`: responsive arcade styling.
+- `src/retro.js`: game rules, audio and animation.
+- `src/expansion.js` and `src/expansion.css`: plunger bonus, sumo rhythm/scene and responsive coach panel.
+- `src/gym-animation.js`: pose-driven gym cast and muscle inflation/deflation.
+- `assets/retro/`: original PNGs, WebP runtime atlases and sprite rectangles.
+- `scripts/build.py`: run with Python 3 to rebuild the offline `index.html`.
 
-Edit `src/game.html`, then run `python scripts/build.py`. Commit the rebuilt `index.html` alongside source changes. GitHub Pages serves that prebuilt file; no custom workflow is needed.
+The complete game is larger than the conversation's inline-preview limit. Open the standalone page for the full experience. The earlier Level 1 study remains separate. The previous 3D package was preserved as the sibling `royal-flush-3d-archive.zip`; `README-3D-ARCHIVE.md`, `src/game.html` and `scripts/build-3d-archive.py` retain its sources. The current default build produces the retro game.
 
-`src/page-template.html` supplies standalone styles; the build extracts its inner document into a top-level page. Music is in `assets/`. Main settings: `ROUND_SECONDS`, `LEVELS`, `AWARDS`, `progress()`, and `attemptScore()`. `applyCharacter()` changes character and room props; `drawInterface()` renders the mesh interface. The optional `--fragment-output` build argument generates the compressed inline preview.
+## Validation
 
-## Checks
+Browser checks cover all levels, locks, input, countdown, exact music selection, Perfect Flush bonuses, scene event ordering, options pause, success/failure, retry reset, score timing and campaign totals. Desktop and phone screenshots were inspected. Additional checks cover gentle play, persisted settings, audio metadata and compact desktop layout. Physical speaker output is not independently measured.
 
-Automated tests covered timing, single-attempt scoring, awards, shortfalls, locks, retries, instant completion at 100%, and all levels. Headless Edge completed three-level progression and rendered the gym character. Its audio context was running after interaction and decoded tracks contained non-silent samples, including Level 3. Physical speaker output was not audited.
 
-## Event sound effects
+## Gym animation and voiced countdown update
 
-User-supplied steam train, sink burst, four random tile crashes, and final splash effects are embedded in the game. Steam and water trigger once per attempt. Tile sounds avoid immediate repeats and limit overlapping crashes. Finishing clears other effects before the splash; retry and menu transitions clear all effects. The SOUND control mutes music and effects together. Original MP3 files and compressed preview versions are in assets; effects-manifest.json records the supplied filenames.
+Each new attempt and level has embedded THREE, TWO, ONE, GO voice clips synchronized to the visible countdown. The voice uses the Effects volume and SOUND toggle, pauses with options/tab visibility, and works offline without browser speech services. These now use the supplied ElevenLabs MP3 performance rather than the earlier offline robotic voice. The 35-second timer and tapping still begin only at GO.
 
-Headless Edge verified all seven effects decode to non-silent audio, steam/water do not retrigger every frame, tile selection varies, the final splash replaces active effects, and retries clear effects.
+The bodybuilder's upper arms, shoulders and chest progressively enlarge with relief progress while the head, feet and toilet stay anchored. At the plop, a short deflation transition reveals a separately illustrated slender character with an oversized vest. The plop lettering moves above him so the reveal remains visible. A retry restores his starting build.
 
-## Level 1 bathroom panic
+The gym bystanders now use distinct authored poses. The lifter curls through low/middle/high positions with both hands attached to the illustrated bar, sets it on the platform, then runs away. The trainer checks the clipboard, turns to coach, recoils from the blast, loses the separate animated clipboard, and escapes. The runner cycles through stride poses on the moving treadmill belt, speeds up, stumbles off and lands seated on the floor. Reduced-motion mode retains the readable event poses and final reveal while suppressing rapid motion.
 
-All rounds have a 35-second limit, with targets of 110, 135 and 160 taps. Reaching 100% still completes the round immediately; each attempt must earn at least 3,000 points to unlock the next level. Music clips cover the full time limit.
+New runtime artwork: `assets/retro/deflated.webp`, `lifter.webp`, `runner.webp`, and `trainer.webp`, with original PNG atlases alongside. Current countdown clips are `assets/voice-three.mp3`, `voice-two.mp3`, `voice-one.mp3`, and `voice-go.mp3`. The original combined recording is preserved in `assets/announcer-originals/`; natural pauses were used to split the four words for synchronization. Older WAV files are archived assets and are not embedded or played.
 
-Level 1 adds rattling cupboard doors, a panicked mouse carrying a tiny toilet roll, a leap and escape with dust, progressive branching floor cracks and a falling KEEP CALM sign. The mouse appears after tiles start falling and its escape continues through an early finish. Replays reset all props; the new sequence is exclusive to Level 1. A brief pause precedes the final splash.
+Additional checks cover voice cue ordering on repeated levels, preserved countdown input lock, fixed treadmill contact, changing NPC poses, measurable upper-body growth, full deflation after the plop, collapse and retry reset. The three number clips each fit inside their one-second slots; the GO performance continues naturally into play.
 
-Browser checks covered the tile-before-mouse sequence, opening doors, complete escape, growing cracks, falling sign, next-level reset and 35-second decoded music durations.
+## Plunger and sumo expansion
 
-## Menu activation and toilet roll sounds
+Campaign order is bathroom → gym → plunger bonus → palace → sumo → final tally. Bonus instructions precede its voiced countdown. Press once as the approaching ring meets the green ring; wait for the plunger to rise before the next beat. A good push earns 100 points, a precise push 150, plus a growing streak bonus capped at 50 per push. Eight good pushes clear the visible blockage and award the Golden Plunger. All twelve seconds remain available to score. Early/late pushes break the streak; repeated taps in the same beat cannot farm points. Even zero points allows the player to continue to Level 3. Bonus points are listed separately in the campaign finale and never contribute to a main-level pass.
 
-Audio initialization now begins before scene loading, preserving clicks and key presses during loading. Every menu entry requests playback, and focus or visibility restoration retries it. ENABLE SOUND is shown only while the audio context is not running. Browsers that prohibit audible autoplay still require a user interaction; the game cannot override that policy.
+At Level 4 the rhythm repeats a 14.6-second cycle: slow taps (4s), fast taps (2.5s), get ready (1.5s), push and hold (5.6s), release (1s). Slow taps need 440ms separation and give 2.6 relief; fast taps need 145ms and give 1.6. During PUSH AND HOLD, keep the mouse/touch button or Space pressed. Pressure builds evenly over the held section, capped at 14 per cycle. Release during the RELEASE window after holding continuously for at least 1.5 seconds to earn +12 relief. Early releases earn no timing bonus; repeated clicks cannot replace the sustained hold. Pausing, losing focus or pointer cancellation safely cancels the hold. Gentle mode still assists tapping phases but the held push and release use the same deliberate controls.
 
-The supplied holder effect plays once at detachment. The paper effect plays once when the roll reaches the floor. Both use the shared sound control and are cleared on finish, retry or menu return. Browser checks verified decoded non-silent clips, separate event timing, no frame-by-frame retrigger, audio-context reuse, menu restart, and automatic menu playback in the standalone file.
+The sumo retains the 35-second deadline and 3,000-point single-attempt clear rule. A test with two slow taps/second, four fast taps/second and correctly held pushes cleared within the 35-second deadline. His expressions intensify, petals drift, pools ripple, birds flee, deck cracks appear and the final plop sends water and a bucket flying. Reduced-motion keeps the cues readable without rapid character shaking.
 
-## Level 2: The Final Rep
+Existing three-level personal scores and unlocks migrate into four slots. Expanded-campaign records use a separate `expandedCampaign` field so an old three-level total is not compared to the longer run. Your full original sumo and bonus MP3s are embedded without trimming. They begin at GO and stop at the end of their respective round. No network audio service is used.
 
-Level 2 now uses a separate gym with a lifting platform, squat rack, mirrors, treadmill, weights and three reacting gym members. The bulky protagonist has a smaller bald head, moustache, sweatband, BULK MODE vest, lifting belt, wrist wraps and skinny calves. His MASS REGRET shaker accompanies the SIX PROTEIN SHAKES / ZERO FIBRE predicament.
+Validation includes a complete four-level run with earned bonus points, precise/early bonus input, spam protection, pausing, classic sumo clearance, timeout/retry, mobile layouts and the final total including the separate bonus.
 
-The trainer approaches to spot him, loses a clipboard at halfway and flees. A lifter lowers then escapes with a barbell; the treadmill runner accelerates in place. Plates bounce at the final splash and a NEW PERSONAL BEST sign appears before the score tally. The existing Level 2 music and 35-second, 135-tap target remain. Bathroom props and their destruction sounds are hidden/suppressed specifically in Level 2.
+## Recorded announcer update
 
-LEVEL-2-SOUND-REQUESTS.md contains eight ready-to-use sound generation prompts and optional voice lines. These new recordings are not yet supplied; existing sound effects support the scene in the meantime. Browser checks covered the separate environment, character, event sequence, escaped actors, stationary runner, score, celebration and Level 1 restoration.
+All active speech now comes from the two replacement Arcade (energetic) ElevenLabs takes. The combined countdown is split into THREE/TWO/ONE/GO clips without changing the speaker or speech speed; the displayed countdown remains three seconds and music begins at GO. The original files and a timing manifest are included in `assets/announcer-originals/` and `assets/announcer-manifest.json`.
 
-### Gym cast refinement
+Slow-down and nice-and-steady alternate on successive sumo cycles. Faster, get ready, push-and-hold, keep-holding and release accompany their actions. Beautiful/what-a-relief plays at each successful main-level plop. Only one announcer clip can play at a time, and music ducks beneath speech. Sound mute, effects volume and game pausing apply to the recordings. No runtime speech service or network connection is needed.
 
-The spotter has swept hair, the lifter a mohawk and the runner a ponytail. All three have broader shoulders and defined arm and leg muscles. The lifter uses articulated upper arms, elbows and forearms with both hands attached to the bar through curls, lowering and escape. The spotter stands further forward and to the right, with the treadmill moved back and outward. Browser checks at a 936-pixel viewport verified visibility, hand-to-bar alignment, evacuation, scoring and Level 1 restoration.
+Additional checks verify MP3-only runtime speech, all four countdown beats, playable sustained holds, early-release rejection, click-spam rejection, cancellation on pause, keyboard/mouse releases, bonus-round countdown and phone layout.
 
-## Supplied gym audio and final collapse
 
-The eight gym recordings are now embedded and connected to rattle, clipboard blast, barbell lowering, fleeing footsteps, carried barbell, treadmill sprint, final plate bounce and hanging sign events. The treadmill loops until the round ends. At the final plop the yellow runner tumbles off the treadmill onto the gym floor, stays down during results, and resets upright for a new attempt.
+## Rhythm from Level 1
 
-The supplied tally sound plays on every level for exactly the 2.4-second score animation, looping the two-second source to cover the complete count. It starts at the same level-specific delay as the visual tally and stops at completion; the final splash preserves the scheduled tally. Menu and retry transitions cancel all effects.
+All main levels now share the coached controls. See RHYTHM-DIFFICULTY.md for the progression table and METER-SOUND-PROMPTS.md for the requested responsive audio assets. Existing Perfect Flush charge/tap windows have been replaced by held pushes and timed releases across the campaign.
 
-Headless Edge verified all 18 effects decode to non-silent audio, gym events trigger, treadmill stops, runner collapses, Level 1/2 tally start offsets and duration match the visuals, and audio/poses reset correctly.
 
-## Level 3: The Royal Blockage
-
-A separate gold-and-burgundy palace replaces the bathroom, with stained glass, a velvet canopy, marble dais, carpet, chandelier, banners, cheese banquet and armour. The king wears a cape, larger crown, curled moustache and pointed beard. A formal butler escalates from prune to remedy to giant brush; the trumpeter reacts, guards flee and one loses his helmet. Armour collapses as pressure rises. The final splash launches the crown, ripples the carpet and reveals THE KING HAS BEEN RELIEVED as the court bows. The crown lands crookedly before the score tally begins at 3.1 seconds. Existing music, 35-second limit, 160-tap target and score rules remain.
-
-LEVEL-3-SOUND-REQUESTS.md supplies twelve palace sound prompts plus optional voice lines; these new recordings are not yet supplied. Browser checks verified Level 3 event progression, scoring, crown landing and returning to Level 1.
-
-### Palace recordings
-
-Six supplied palace effects now play at their matching events: opening fanfare, tray at 10% progress, banner gust at 30%, chandelier at 50%, nervous guards at 68%, and collapsing armour at 82%. Each is triggered once per attempt, routed through the shared sound control, and cleared at finish or reset. Browser verification covered decoding, event triggers, no per-frame repetition, cleanup and Level 1 isolation.
