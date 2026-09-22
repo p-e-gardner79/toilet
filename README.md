@@ -161,3 +161,7 @@ Menu audio attempts playback during loading, then on menu entry. Document-wide t
 
 ### Animation and tally fixes (22 September)
 The king uses a complete uncrowned sprite with a separate animated crown. The ship foreground sinks against a stationary sky and ocean. Sumo splash arcs are replaced with expanding pool ripples. Scrub Club has three stain resistances (110/210/330), rewards (120/220/340 plus combo), and four supplied contact-driven scrub sounds. The campaign tally now counts every row and the total simultaneously over 3.2 seconds; tap or Space reveals the result immediately without starting a new run.
+
+
+### iPhone voice/tally audio update
+Countdown, coach vocals and tally use predecoded Web Audio buffers unlocked on a user gesture. Start waits for these 13 clips to decode. Voice timing comes from actual clip durations; release cues retain priority. Volume, mute, pause/resume and tally stops are preserved. Music and environmental effects retain their mixer. Tested mobile touch with HTML media playback denied, countdown and coaching, pause/resume and tally completion; campaign regression passed. Physical iPhone playback needs device verification.

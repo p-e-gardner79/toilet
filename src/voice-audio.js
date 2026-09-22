@@ -1,0 +1,15 @@
+// Short, time-sensitive clips share one gesture-unlocked Web Audio context.
+// Music remains streamed through the existing music mixer.
+let voiceContext=null;
+const voiceBuffers=new Map(),voiceAudioErrors=[],voiceAudioLog=[];
+function audioError(name,error){voiceAudioErrors.push({name,error:String(error)});if(voiceAudioErrors.length>20)voiceAudioErrors.shift();console.warn('Royal Flush audio:',name,error);}
+function getVoiceContext(){return voiceContext||(voiceContext=new (window.AudioContext||window.webkitAudioContext)());}
+function unlockVoiceAudio(){try{const context=getVoiceContext();if(context.state!=='running')context.resume().catch(error=>audioError('resume',error));}catch(error){audioError('context',error);}}
+const bufferedClip=name=>name.startsWith('voice-')||name==='tally';
+async function prepareVoices(){const names=Object.keys(ASSETS).filter(bufferedClip),context=getVoiceContext();for(const name of names){const encoded=atob(ASSETS[name].split(',')[1]),bytes=new Uint8Array(encoded.length);for(let i=0;i<encoded.length;i++)bytes[i]=encoded.charCodeAt(i);const buffer=await context.decodeAudioData(bytes.buffer);voiceBuffers.set(name,buffer);if(name.startsWith('voice-'))voiceLengths[name.slice(6)]=Math.ceil(buffer.duration*1000);}}
+function makeEffectAudio(name){if(!bufferedClip(name))return makeAudio(name);const context=getVoiceContext(),gain=context.createGain();gain.connect(context.destination);let source=null,offset=0,started=0,volume=1,isMuted=muted,loop=false,paused=true,version=0;
+ const log=action=>{if(!window.__RF_TEST__)return;voiceAudioLog.push({name,action,at:now()});if(voiceAudioLog.length>150)voiceAudioLog.shift();};
+ const position=()=>{const buffer=voiceBuffers.get(name),time=offset+(source?context.currentTime-started:0);return loop&&buffer?time%buffer.duration:time;};
+ const stop=()=>{if(source){source.onended=null;try{source.stop();}catch{}source.disconnect();source=null;}};
+ const audio={onended:null,get paused(){return paused;},get currentTime(){return position();},set currentTime(value){offset=Math.max(0,value);started=context.currentTime;},get volume(){return volume;},set volume(value){volume=value;gain.gain.value=isMuted?0:volume;},get muted(){return isMuted;},set muted(value){isMuted=value;gain.gain.value=isMuted?0:volume;},get loop(){return loop;},set loop(value){loop=value;if(source)source.loop=value;},pause(){version++;offset=position();stop();paused=true;log('pause');},async play(){const request=++version;paused=false;try{if(context.state!=='running')await context.resume();if(request!==version||paused)return;const buffer=voiceBuffers.get(name);if(!buffer)throw new Error('Clip not preloaded: '+name);stop();if(offset>=buffer.duration)offset=0;source=context.createBufferSource();source.buffer=buffer;source.loop=loop;source.connect(gain);started=context.currentTime;source.onended=()=>{if(request!==version)return;stop();paused=true;offset=0;log('ended');audio.onended?.();};source.start(0,offset);log('play');}catch(error){if(request===version)paused=true;audioError(name,error);throw error;}}};return audio;
+}
