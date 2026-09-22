@@ -41,3 +41,32 @@ Prompt set:
 - **Sumo:** three equal columns, genuine transparent background; same huge round adult wrestler on a tiny white toilet, orange mawashi covering the groin, black topknot, sandals, fists on knees. Calm, strained and wild expressions at matching size/baseline. Refinement used the bodybuilder atlas as a style reference: larger head, enormous white oval cartoon eyes, button nose, oversized grin/gritted teeth, thick eyebrows, smooth simplified shapes and bright arcade highlights; no moustache, realistic skin texture, background or text.
 
 Sources were generated with the built-in image tool, copied into this project and exported to WebP with alpha-bounded atlas rectangles. Synthesized coach cues are `voice-pace-it.wav`, `voice-faster.wav`, `voice-hold.wav`, `voice-push.wav` and `voice-breathe.wav`, rendered offline using the same processed eSpeak NG voice as the countdown.
+
+
+## Space and Scrub Club expansion
+
+Generated with the built-in image tool in the established saturated 1990s arcade illustration style, bold outlines and no baked scanlines. Original PNGs and runtime WebPs are retained in assets/retro.
+
+- astronaut: transparent three-pose atlas, front-facing orange-suited astronaut strapped to a futuristic toilet, calm, straining and wild-eyed expressions, consistent silhouette and lowered trousers.
+- space: spacecraft toilet cabin with blue/orange panels, open central staging area, round starfield/Earth window at upper right, storage, warning lamp and plumbing.
+- alien: transparent three-pose green alien atlas, curious, alarmed and panicked, matching the astronaut style.
+- Scrub Club: procedural porcelain bowl, dirt patches, moving brush and cleaning sparkles over the bathroom artwork.
+
+Sprite crops are recorded in rects.json. Animation is layered and procedural; scanlines are applied at runtime.
+
+
+## Captain and toilet-lid expansion
+
+Two assets generated with the built-in image tool: captain.png/.webp is a transparent three-pose, face-on older sea captain seated on a porcelain toilet, in navy coat and white peaked anchor cap, calm/gritted/wild-eyed expressions. ship.png/.webp is an empty sailing-ship deck with ocean horizon, rigging, cream sail, wheel and barrels, reserved center space for the hero. Prompts specified bold saturated 1990s cartoon arcade illustration, no lettering, no UI and no scanlines. Atlas crops are recorded in rects.json. The sinking deck, leak, rolling barrel, cracks, seagulls, water and lifebuoy are animated in code. Lid Panic uses code-drawn porcelain toilets with independent interactive lids.
+
+
+## Zeus / Olympus
+
+Built-in image generation produced zeus.png and olympus.png, with WebP runtime copies. Zeus is a transparent, aligned three-pose atlas: calm, gritted strain and wild static beard, seated on a gold/marble toilet in a white toga. Olympus is an empty frontal marble cloud palace with gold columns and purple banners. Prompts required saturated dimensional 1990s arcade cartoon art, dark outlines, no text/UI/scanlines. The charge ring, bolts, cloud drift, Earth globe and quake are code-animated layers. Crops are retained in rects.json.
+
+The additional olympus-cast transparent atlas contains a nervous Greek attendant, his singed-helmet variant, and a startled eagle. These were generated in the same shaded arcade style and animated as separate sprites; original PNG and WebP are retained.
+
+
+## Unified cartoon revision
+
+The bodybuilder atlas was the style reference for five built-in image-generation requests: captain-cartoon, zeus-cartoon, ship-cartoon, olympus-cartoon and olympus-cast-cartoon. Prompts specified oversized expressive heads/eyes, thick dark outlines, simple saturated colour blocks, two-tone shading, no realistic skin or intricate texture, and no UI/text/scanlines. Character atlases retain transparent alpha. Backgrounds remain frontal with clear central staging. Original detailed variants are preserved; build scripts prefer the new cartoon files.

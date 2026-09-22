@@ -4,11 +4,11 @@ function gymPose(name,index,x,footY,standingHeight,referenceHeight,rotation=0,fl
   sprite(name,index,x,footY,h,rotation,flip);
 }
 function gymBulk(t){
-  const inflation=.36*Math.pow(progress(),1.25),plopAge=age('plop',t);
+  const inflation=(t<signatureCelebrateUntil?.12:0)+.36*Math.pow(progress(),1.25)+(t<gymWobbleUntil&&!prefs.motion?Math.sin(t/45)*.045:0),plopAge=age('plop',t);
   const deflation=plopAge<0?0:prefs.motion?1:ease(plopAge/.9);
   return {inflation,deflation,chestScale:1+inflation-(.48+inflation)*deflation};
 }
-function gym(t){
+function gym(t){drawSignature(t);
   const lower=age('lower',t),flee=age('lifter',t),trainerEscape=age('trainer',t),blast=age('blast',t),run=age('runner',t),plopAge=age('plop',t);
   const elapsed=Math.max(0,t-roundStart),moving=state==='playing'||state==='ending'||state==='done';
   const curlSequence=[0,0,1,2,2,1],curlFrame=prefs.motion||!moving?0:curlSequence[Math.floor(elapsed/220)%curlSequence.length];
